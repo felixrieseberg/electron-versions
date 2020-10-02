@@ -1,0 +1,20 @@
+{
+  "name": "electron-versions",
+  "version": "1.0.0",
+  "description": "Get Electron and Chromium versions for tags in a given directory",
+  "main": "index.js",
+  "bin": {
+    "electron-versions": "./index.js"
+  },
+  "scripts": {
+    "test": "node ./test/test.js"
+  },
+  "author": "Felix Rieseberg <felix@felixrieseberg.com>",
+  "license": "MIT",
+  "dependencies": {
+    "electron-to-chromium": "^1.3.576",
+    "minimist": "^1.2.5",
+    "semver": "^7.3.2",
+    "text-table": "^0.2.0"
+  }
+}
