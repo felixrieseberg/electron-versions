@@ -10,12 +10,17 @@ const { fullVersions } = require('electron-to-chromium');
 const table = require('text-table');
 
 const argv = require('minimist')(process.argv.slice(2));
+const help = !!(argv['h'] || argv['help']);
 const filter = argv['f'] || argv['filter'];
 const length = argv['l'] || argv['length'] || 10;
 const printJson = argv['json'];
 const cwd = getTargetDir();
 
 async function main() {
+  if (help) {
+    return printHelp();
+  }
+
   const currentBranch = getCurrentBranch();
   const tags = getTags();
   const versions = getElectronVersions(tags);
@@ -54,6 +59,9 @@ function getTags() {
 
   // Get correct length
   tags = tags.slice(0, length);
+
+  // Throw in the default branch
+  tags.push(getDefaultBranch());
 
   return tags;
 }
@@ -108,6 +116,10 @@ function printResult(versions = []) {
   }
 
   console.log(table(rows));
+}
+
+function getDefaultBranch() {
+  return execSync('git symbolic-ref --short HEAD', { cwd }).trim();
 }
 
 function printHelp() {
