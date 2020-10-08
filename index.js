@@ -119,7 +119,9 @@ function printResult(versions = []) {
 }
 
 function getDefaultBranch() {
-  return execSync('git symbolic-ref --short HEAD', { cwd }).trim();
+  return execSync('git symbolic-ref --short HEAD', { cwd })
+    .toString()
+    .trim();
 }
 
 function printHelp() {
