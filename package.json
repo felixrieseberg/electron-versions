@@ -12,9 +12,9 @@
   "author": "Felix Rieseberg <felix@felixrieseberg.com>",
   "license": "MIT",
   "dependencies": {
-    "electron-to-chromium": "^1.3.578",
+    "electron-to-chromium": "^1.3.652",
     "minimist": "^1.2.5",
-    "semver": "^7.3.2",
+    "semver": "^7.3.4",
     "text-table": "^0.2.0"
   }
 }

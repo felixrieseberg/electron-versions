@@ -44,7 +44,7 @@ function getTargetDir() {
 
 function getTags() {
   const buf = execSync('git tag -l', { cwd });
-  let tags = buf.toString().split(EOL);
+  let tags = buf.toString().split(/\s/);
 
   // Remove invalid tags
   tags = tags.filter((v) => valid(v));
