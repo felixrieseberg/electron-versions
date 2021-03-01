@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
-const table = require('text-table');
-const fs = require('fs');
-const path = require('path');
+const table = require("text-table");
+const fs = require("fs");
+const path = require("path");
 
-const { getVersions } = require('./electron-versions');
+const { getVersions } = require("./electron-versions");
+const { writeMarkdown } = require("./write-markdown");
 
-const argv = require('minimist')(process.argv.slice(2));
-const help = !!(argv['h'] || argv['help']);
-const filter = argv['f'] || argv['filter'];
-const length = argv['l'] || argv['length'] || 10;
-const printJson = argv['json'];
+const argv = require("minimist")(process.argv.slice(2));
+const help = !!(argv["h"] || argv["help"]);
+const filter = argv["f"] || argv["filter"];
+const length = argv["l"] || argv["length"] || 10;
+const write = argv["w"] || argv["write"];
+const printJson = argv["json"];
 const cwd = getTargetDir();
 
 async function main() {
@@ -21,12 +23,16 @@ async function main() {
   const versions = getVersions({ cwd, filter, length });
 
   printResult(versions);
+
+  if (write) {
+    writeMarkdown(versions);
+  }
 }
 
 function getTargetDir() {
-  const firstArg = argv._[0]
+  const firstArg = argv._[0];
   if (firstArg && fs.existsSync(firstArg)) {
-    if (fs.existsSync(path.join(firstArg, 'package.json'))) {
+    if (fs.existsSync(path.join(firstArg, "package.json"))) {
       return firstArg;
     }
   }
@@ -44,8 +50,8 @@ function printResult(versions = []) {
   for (const { tag, electron, chromium } of versions) {
     rows.push([
       `Tag ${tag}`,
-      `Electron ${electron || '?'}`,
-      `Chromium ${chromium || '?'}`
+      `Electron ${electron || "?"}`,
+      `Chromium ${chromium || "?"}`,
     ]);
   }
 
@@ -58,7 +64,7 @@ function printHelp() {
   text += `usage: electron-versions [directory] [-l | --length=length]${EOL}`;
   text += `       [-f | --filter=semver filter] [--json]${EOL}`;
   text += EOL;
-  text += `directory:    By default, the current working directory${EOL}`
+  text += `directory:    By default, the current working directory${EOL}`;
   text += `length:       How many tags to check (default: 10)${EOL}`;
   text += `filter:       A filter passed to semver, like ">=1.2.3"${EOL}`;
   text += `json:         Print result as JSON${EOL}`;

@@ -7,7 +7,8 @@
     "electron-versions": "src/bin.js"
   },
   "scripts": {
-    "test": "node ./test/test.js"
+    "test": "node ./test/test.js",
+    "prettier": "npx prettier \"src\" -w"
   },
   "author": "Felix Rieseberg <felix@felixrieseberg.com>",
   "license": "MIT",
