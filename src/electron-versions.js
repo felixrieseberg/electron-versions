@@ -14,6 +14,7 @@ const { fullVersions } = require('electron-to-chromium');
  * @param {*} options
  * @param {string} options.filter
  * @param {string} options.cwd
+ * @param {number} options.length
  * @returns {Array} versions
  */
 function getVersions(options) {

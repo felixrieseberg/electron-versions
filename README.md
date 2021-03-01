@@ -21,5 +21,22 @@ Tag 4.4.3   Electron 7.2.4          Chromium 78.0.3904.130
  * `-l | --length`: How many tags to check (default: 10)
  * `--json`: Print the result as JSON
 
+## Usage as a module
+This module is synchronous. It could be async, but since using this
+anywhere outside of cli tools seems silly, I didn't bother implementing
+an async version.
+
+```js
+const { getVersions } = require('electron-versions')
+
+const options = {
+  cwd: '/path/to/the/repo',
+  filter: '>4.0.0',         // Undefined for no filter
+  length: 10                // Undefined for no limit
+}
+
+const versions = getVersions(options);
+```
+
 ## License
 MIT
