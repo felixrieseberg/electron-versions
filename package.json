@@ -1,6 +1,6 @@
 {
   "name": "electron-versions",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Get Electron and Chromium versions for tags in a given directory",
   "main": "src/index.js",
   "bin": {
