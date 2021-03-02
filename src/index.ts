@@ -1,9 +1,5 @@
 import { getVersions } from "./electron-versions";
 
-module.exports = {
-  getVersions,
-};
-
-exports = {
+export {
   getVersions,
 };

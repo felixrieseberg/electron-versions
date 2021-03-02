@@ -1,3 +1,8 @@
+# 2.0.1
+
+- Fix a small export error
+- Fix JSON indent
+
 # 2.0.0
 
 - Moved to TypeScript

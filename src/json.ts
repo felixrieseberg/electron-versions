@@ -22,7 +22,7 @@ export function getJson(versions: Array<Version>) {
     data[tag] = { electron, chromium };
   });
 
-  return JSON.stringify(data);
+  return JSON.stringify(data, undefined, 2);
 }
 
 export function writeJson(versions: Array<Version>, { jsonPath }: Options) {
