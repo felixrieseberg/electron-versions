@@ -1,5 +1,7 @@
 import * as fs from "fs";
 
+import { Options, Version } from "./shared-types";
+
 export function readJson({ jsonPath }) {
   let data = {};
 
@@ -13,4 +15,16 @@ export function readJson({ jsonPath }) {
   return data;
 }
 
-export function writeJson(versions, { jsonPath }) {}
+export function getJson(versions: Array<Version>) {
+  const data = {};
+
+  versions.forEach(({ tag, electron, chromium }) => {
+    data[tag] = { electron, chromium };
+  });
+
+  return JSON.stringify(data);
+}
+
+export function writeJson(versions: Array<Version>, { jsonPath }: Options) {
+  fs.writeFileSync(jsonPath, getJson(versions));
+}

@@ -8,6 +8,7 @@ import { getVersions } from "./electron-versions";
 import { writeMarkdown } from "./write-markdown";
 import { getTextTable } from "./table";
 import { Options, Version } from "./shared-types";
+import { getJson, writeJson } from "./json";
 
 const argv = require("minimist")(process.argv.slice(2));
 const help = !!(argv["h"] || argv["help"]);
@@ -44,6 +45,8 @@ async function main() {
   }
 
   if (!!writeJsonArg) {
+    writeJson(versions, options);
+    console.log(`${EOL}Wrote versions to ${jsonPath}.`);
   }
 }
 
@@ -96,7 +99,7 @@ function getTargetDir(): string {
 
 function printResult(versions: Array<Version> = []) {
   if (printJson) {
-    return console.log(versions);
+    return console.log(getJson(versions));
   }
 
   console.log(getTextTable(versions));
@@ -107,11 +110,14 @@ function printHelp() {
 
   text += `usage: electron-versions [directory] [-l | --length=length]${EOL}`;
   text += `       [-f | --filter=semver filter] [--json]${EOL}`;
+  text += `       [--write-markdown [Path]] [--write-json [Path]]${EOL}`;
   text += EOL;
-  text += `directory:    By default, the current working directory${EOL}`;
-  text += `length:       How many tags to check (default: 10)${EOL}`;
-  text += `filter:       A filter passed to semver, like ">=1.2.3"${EOL}`;
-  text += `json:         Print result as JSON${EOL}`;
+  text += `directory:      By default, the current working directory${EOL}`;
+  text += `length:         How many tags to check (default: 10)${EOL}`;
+  text += `filter:         A filter passed to semver, like ">=1.2.3"${EOL}`;
+  text += `json:           Print result as JSON${EOL}`;
+  text += `write-markdown  Write results to a md file (optionally, with a path)${EOL}`;
+  text += `write-json      Write results to a json file (optionally, with a path). Speeds up future execution.${EOL}`;
 }
 
 main();
