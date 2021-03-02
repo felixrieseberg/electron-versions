@@ -1,3 +1,7 @@
+# 1.3.1
+
+- Handle the default branch first, ensuring it's at the top of results
+
 # 1.3.0
 
 - Add a `--write` option that allows writing the results to a markdown
