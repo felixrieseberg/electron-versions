@@ -15,6 +15,7 @@ const { fullVersions } = require("electron-to-chromium");
  * @param {string} options.filter
  * @param {string} options.cwd
  * @param {number} options.length
+ * @param {function} options.onProgress
  * @returns {Array} versions
  */
 function getVersions(options) {
@@ -52,10 +53,12 @@ function getTags({ filter, cwd, length }) {
   return tags;
 }
 
-function getElectronVersions(tags = [], { cwd }) {
+function getElectronVersions(tags = [], { cwd, onProgress }) {
   const result = [];
 
-  for (const tag of tags) {
+  for (let i = 0; i < tags.length; i++) {
+    const tag = tags[i];
+
     checkout(tag, { cwd });
     const packageJson = readPackageJson({ cwd });
     const electron =
@@ -64,6 +67,13 @@ function getElectronVersions(tags = [], { cwd }) {
 
     const chromium = fullVersions[electron];
     result.push({ tag, electron, chromium });
+
+    if (!!onProgress) {
+      onProgress(i + 1, tags.length - i - 1, tags.length);
+    }
+  }
+
+  for (const tag of tags) {
   }
 
   return result;

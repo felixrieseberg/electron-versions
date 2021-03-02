@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-const table = require("text-table");
 const fs = require("fs");
 const path = require("path");
+const { EOL } = require("os");
 
 const { getVersions } = require("./electron-versions");
 const { writeMarkdown } = require("./write-markdown");
+const { getTextTable } = require("./table");
 
 const argv = require("minimist")(process.argv.slice(2));
 const help = !!(argv["h"] || argv["help"]);
@@ -20,13 +21,36 @@ async function main() {
     return printHelp();
   }
 
-  const versions = getVersions({ cwd, filter, length });
+  const versions = getVersions({ cwd, filter, length, onProgress });
 
   printResult(versions);
 
-  if (write) {
-    writeMarkdown(versions);
+  if (!!write) {
+    const filePath = getWriteDir();
+    writeMarkdown(versions, { filePath });
+    console.log(`${EOL}Wrote versions to ${filePath}.`);
   }
+}
+
+function onProgress(done, left, total) {
+  process.stdout.clearLine();
+  process.stdout.cursorTo(0);
+  process.stdout.write(`Checked ${done}/${total} tags`);
+
+  if (left === 0) {
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+  }
+}
+
+function getWriteDir() {
+  // Absolute path? Don't mess with it
+  if (path.isAbsolute(write)) {
+    return write;
+  }
+
+  // Not absolute, return path in cwd
+  return path.join(cwd, write);
 }
 
 function getTargetDir() {
@@ -45,17 +69,7 @@ function printResult(versions = []) {
     return console.log(versions);
   }
 
-  const rows = [];
-
-  for (const { tag, electron, chromium } of versions) {
-    rows.push([
-      `Tag ${tag}`,
-      `Electron ${electron || "?"}`,
-      `Chromium ${chromium || "?"}`,
-    ]);
-  }
-
-  console.log(table(rows));
+  console.log(getTextTable(versions));
 }
 
 function printHelp() {

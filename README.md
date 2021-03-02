@@ -19,6 +19,7 @@ Tag 4.4.3   Electron 7.2.4          Chromium 78.0.3904.130
 ## Usage
  * `-f | --filter`: A semver-range used to filter the tags tested
  * `-l | --length`: How many tags to check (default: 10)
+ * `-w | --write`: Write the results to a given markdown file
  * `--json`: Print the result as JSON
 
 ## Usage as a module
@@ -33,6 +34,7 @@ const options = {
   cwd: '/path/to/the/repo',
   filter: '>4.0.0',         // Undefined for no filter
   length: 10                // Undefined for no limit
+  onProgress: (done, left, total) => {}
 }
 
 const versions = getVersions(options);
