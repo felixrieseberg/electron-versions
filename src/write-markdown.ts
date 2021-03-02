@@ -1,16 +1,12 @@
-const fs = require("fs");
+import * as fs from "fs";
 
-const { getMarkdownTable } = require("./table");
+import { Options, Version } from "./shared-types";
+import { getMarkdownTable } from "./table";
 
 const START_TABLE = "<!--- Begin Electron Version Table --->";
 const END_TABLE = "<!--- End Electron Version Table --->";
 
-/**
- * @param {*} versions
- * @param {*} options
- * @returns
- */
-function writeMarkdown(versions, options) {
+export function writeMarkdown(versions: Array<Version> = [], options: Options) {
   if (!versions || versions.length === 0) {
     return;
   }
@@ -19,11 +15,11 @@ function writeMarkdown(versions, options) {
   const table = `${START_TABLE}\n${markdown}\n${END_TABLE}`;
 
   // Check if we already have a file
-  const exists = fs.existsSync(options.filePath);
+  const exists = fs.existsSync(options.mdPath);
   let content = "";
 
   if (exists) {
-    content = fs.readFileSync(options.filePath, "utf-8");
+    content = fs.readFileSync(options.mdPath, "utf-8");
 
     const start = content.indexOf(START_TABLE);
     const end = content.indexOf(END_TABLE) + END_TABLE.length;
@@ -39,9 +35,5 @@ function writeMarkdown(versions, options) {
     content = table;
   }
 
-  fs.writeFileSync(options.filePath, content);
+  fs.writeFileSync(options.mdPath, content);
 }
-
-module.exports = {
-  writeMarkdown,
-};

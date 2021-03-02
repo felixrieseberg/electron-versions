@@ -1,9 +1,10 @@
-const textTable = require("text-table");
-const markdownTable = require("markdown-table");
+import * as textTable from "text-table";
+import * as markdownTable from "markdown-table";
 
-const { getRepoUrl } = require("./package");
+import { getRepoUrl } from "./package";
+import { Options, Version } from "./shared-types";
 
-function getTextTable(versions = [], options) {
+export function getTextTable(versions: Array<Version> = []) {
   const rows = [];
 
   for (const { tag, electron, chromium } of versions) {
@@ -17,7 +18,10 @@ function getTextTable(versions = [], options) {
   return textTable(rows);
 }
 
-function getMarkdownTable(versions = [], options) {
+export function getMarkdownTable(
+  versions: Array<Version> = [],
+  options: Options
+) {
   const rows = [["Tag", "Electron", "Chromium"]];
   const repoUrl = getRepoUrl(options);
 
@@ -40,8 +44,3 @@ function getMarkdownTable(versions = [], options) {
 
   return markdownTable(rows);
 }
-
-module.exports = {
-  getTextTable,
-  getMarkdownTable,
-};

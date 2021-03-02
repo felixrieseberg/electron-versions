@@ -1,72 +1,89 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-const { EOL } = require("os");
+import * as fs from "fs";
+import * as path from "path";
+import { EOL } from "os";
 
-const { getVersions } = require("./electron-versions");
-const { writeMarkdown } = require("./write-markdown");
-const { getTextTable } = require("./table");
+import { getVersions } from "./electron-versions";
+import { writeMarkdown } from "./write-markdown";
+import { getTextTable } from "./table";
+import { Options, Version } from "./shared-types";
 
 const argv = require("minimist")(process.argv.slice(2));
 const help = !!(argv["h"] || argv["help"]);
 const filter = argv["f"] || argv["filter"];
 const length = argv["l"] || argv["length"] || 10;
-const write = argv["w"] || argv["write"];
+const writeMarkdownArg = argv["write-markdown"];
+const writeJsonArg = argv["write-json"];
 const printJson = argv["json"];
 const cwd = getTargetDir();
-const filePath = !!write ? getWriteDir() : null;
+const mdPath = getWriteDir("md", writeMarkdownArg);
+const jsonPath = getWriteDir("json", writeJsonArg);
 
 async function main() {
   if (help) {
     return printHelp();
   }
 
-  const options = {
+  const options: Options = {
     cwd,
     filter,
     length,
     onProgress,
-    filePath,
+    mdPath,
+    jsonPath,
   };
 
   const versions = getVersions(options);
 
   printResult(versions);
 
-  if (filePath) {
+  if (!!writeMarkdownArg) {
     writeMarkdown(versions, options);
-    console.log(`${EOL}Wrote versions to ${filePath}.`);
+    console.log(`${EOL}Wrote versions to ${mdPath}.`);
+  }
+
+  if (!!writeJsonArg) {
   }
 }
 
-function onProgress(done, left, total) {
+function onProgress(done: number, left: number, total: number) {
   // Non-interactive
   if (process.env.CI || !process.stdout || !process.stdout.clearLine) {
     return;
   }
 
-  process.stdout.clearLine();
+  process.stdout.clearLine(0);
   process.stdout.cursorTo(0);
   process.stdout.write(`Checked ${done}/${total} tags`);
 
   if (left === 0) {
-    process.stdout.clearLine();
+    process.stdout.clearLine(0);
     process.stdout.cursorTo(0);
   }
 }
 
-function getWriteDir() {
+function getWriteDir(extension: string, arg?: string | boolean) {
+  const target = arg || "electron-versions";
+
+  // Just a bool?
+  if (target === true) {
+    return path.join(cwd, `electron-versions.${extension}`);
+  }
+
   // Absolute path? Don't mess with it
-  if (path.isAbsolute(write)) {
-    return write;
+  if (typeof target === "string" && path.isAbsolute(target)) {
+    return target;
   }
 
   // Not absolute, return path in cwd
-  return path.join(cwd, write);
+  const extMaybe = target.toString().endsWith(`.${extension}`)
+    ? ""
+    : `.${extension}`;
+  return path.join(cwd, `${target}${extMaybe}`);
 }
 
-function getTargetDir() {
+function getTargetDir(): string {
   const firstArg = argv._[0];
   if (firstArg && fs.existsSync(firstArg)) {
     if (fs.existsSync(path.join(firstArg, "package.json"))) {
@@ -77,7 +94,7 @@ function getTargetDir() {
   return process.cwd();
 }
 
-function printResult(versions = []) {
+function printResult(versions: Array<Version> = []) {
   if (printJson) {
     return console.log(versions);
   }
@@ -86,7 +103,7 @@ function printResult(versions = []) {
 }
 
 function printHelp() {
-  text = ``;
+  let text = ``;
 
   text += `usage: electron-versions [directory] [-l | --length=length]${EOL}`;
   text += `       [-f | --filter=semver filter] [--json]${EOL}`;

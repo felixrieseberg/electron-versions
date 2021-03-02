@@ -1,7 +1,9 @@
-const fs = require("fs");
-const path = require("path");
+import * as fs from "fs";
+import * as path from "path";
 
-function getPackage({ cwd }) {
+import { Options } from "./shared-types";
+
+export function getPackage({ cwd }: Options) {
   const expectedPath = path.join(cwd, "package.json");
 
   if (fs.existsSync(expectedPath)) {
@@ -11,12 +13,12 @@ function getPackage({ cwd }) {
 }
 
 let repoUrl = null;
-function getRepoUrl({ cwd }) {
+export function getRepoUrl(options: Options) {
   if (repoUrl !== null) {
     return repoUrl;
   }
 
-  const p = getPackage({ cwd });
+  const p = getPackage(options);
   const url = (p && p.repository && p.repository.url) || "";
   const isGitHub = url.indexOf("https://github.com/") > -1;
 
@@ -33,8 +35,3 @@ function getRepoUrl({ cwd }) {
 
   return (repoUrl = cleanedUrl);
 }
-
-module.exports = {
-  getPackage,
-  getRepoUrl,
-};

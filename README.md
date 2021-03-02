@@ -19,7 +19,8 @@ Tag 4.4.3   Electron 7.2.4          Chromium 78.0.3904.130
 ## Usage
  * `-f | --filter`: A semver-range used to filter the tags tested
  * `-l | --length`: How many tags to check (default: 10)
- * `-w | --write`: Write the results to a given markdown file
+ * `--write-markdown`: Write the results to a markdown file
+ * `--write-json`: Write the results to a markdown file
  * `--json`: Print the result as JSON
 
 ## Usage as a module
