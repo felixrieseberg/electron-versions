@@ -1,5 +1,3 @@
 import { getVersions } from "./electron-versions";
 
-export {
-  getVersions,
-};
+export { getVersions };

@@ -1,5 +1,5 @@
-import * as textTable from "text-table";
-import * as markdownTable from "markdown-table";
+import textTable from "text-table";
+import markdownTable from "markdown-table";
 
 import { getRepoUrl } from "./package";
 import { Options, Version } from "./shared-types";
