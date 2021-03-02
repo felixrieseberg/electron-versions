@@ -1,3 +1,7 @@
+# 2.0.2
+
+- Fix import errors
+
 # 2.0.1
 
 - Fix a small export error
