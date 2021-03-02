@@ -15,19 +15,27 @@ const length = argv["l"] || argv["length"] || 10;
 const write = argv["w"] || argv["write"];
 const printJson = argv["json"];
 const cwd = getTargetDir();
+const filePath = !!write ? getWriteDir() : null;
 
 async function main() {
   if (help) {
     return printHelp();
   }
 
-  const versions = getVersions({ cwd, filter, length, onProgress });
+  const options = {
+    cwd,
+    filter,
+    length,
+    onProgress,
+    filePath,
+  };
+
+  const versions = getVersions(options);
 
   printResult(versions);
 
-  if (!!write) {
-    const filePath = getWriteDir();
-    writeMarkdown(versions, { filePath });
+  if (filePath) {
+    writeMarkdown(versions, options);
     console.log(`${EOL}Wrote versions to ${filePath}.`);
   }
 }

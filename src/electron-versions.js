@@ -73,9 +73,6 @@ function getElectronVersions(tags = [], { cwd, onProgress }) {
     }
   }
 
-  for (const tag of tags) {
-  }
-
   return result;
 }
 
