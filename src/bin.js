@@ -41,6 +41,11 @@ async function main() {
 }
 
 function onProgress(done, left, total) {
+  // Non-interactive
+  if (process.env.CI || !process.stdout || !process.stdout.clearLine) {
+    return;
+  }
+
   process.stdout.clearLine();
   process.stdout.cursorTo(0);
   process.stdout.write(`Checked ${done}/${total} tags`);

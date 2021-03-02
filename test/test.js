@@ -6,7 +6,7 @@ Tag v1.1.0  Electron 9.0.5   Chromium 83.0.4103.119
 Tag v1.0.0  Electron 9.0.0   Chromium 83.0.4103.64`.trim();
 
 function test() {
-  const script = path.join(__dirname, '../index.js');
+  const script = path.join(__dirname, '../src/bin.js');
   const harness = path.join(__dirname, 'harness');
   const result = execSync(`node ${script} ${harness}`).toString().trim();
 
