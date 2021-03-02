@@ -48,7 +48,7 @@ function getTags({ filter, cwd, length }) {
   tags = tags.slice(0, length);
 
   // Throw in the default branch
-  tags.push(getDefaultBranch({ cwd }));
+  tags.unshift(getDefaultBranch({ cwd }));
 
   return tags;
 }
