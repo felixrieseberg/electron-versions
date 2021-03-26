@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
@@ -7,13 +5,14 @@ import * as path from "path";
 import { satisfies, rcompare, valid } from "semver";
 import { fullVersions } from "electron-to-chromium";
 import { readJson } from "./json";
-import { Options } from "./shared-types";
+import { Options, Version } from "./shared-types";
+import { getTagDate } from "./date";
 
 /**
  * Get Electron and matching Chromium versions for a
  * given directory
  */
-export function getVersions(options: Options) {
+export function getVersions(options: Options): Array<Version> {
   const currentBranch = getCurrentBranch(options);
   const tags = getTags(options);
   const versions = getElectronVersions(tags, options);
@@ -49,9 +48,9 @@ function getTags(options: Options) {
   return tags;
 }
 
-function getElectronVersions(tags = [], options: Options) {
-  const { cwd, onProgress, jsonPath } = options;
-  const result = [];
+function getElectronVersions(tags = [], options: Options): Array<Version> {
+  const { onProgress, jsonPath } = options;
+  const result: Array<Version> = [];
   const jsonData = readJson({ jsonPath });
 
   for (let i = 0; i < tags.length; i++) {
@@ -64,6 +63,7 @@ function getElectronVersions(tags = [], options: Options) {
         tag,
         electron: jsonData[tag].electron,
         chromium: jsonData[tag].chromium,
+        date: jsonData[tag].date || getTagDate(tag, options),
       });
     } else {
       checkout(tag, options);
@@ -71,9 +71,10 @@ function getElectronVersions(tags = [], options: Options) {
       const electron =
         (packageJson.devDependencies && packageJson.devDependencies.electron) ||
         (packageJson.dependencies && packageJson.dependencies.electron);
-
       const chromium = fullVersions[electron];
-      result.push({ tag, electron, chromium });
+      const date = getTagDate(tag, options);
+
+      result.push({ tag, electron, chromium, date });
     }
 
     if (!!onProgress) {

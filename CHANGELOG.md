@@ -1,3 +1,7 @@
+# 2.1.0
+
+- Add date of last commit to output
+
 # 2.0.2
 
 - Fix import errors

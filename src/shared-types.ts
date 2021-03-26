@@ -11,4 +11,5 @@ export interface Version {
   tag: string;
   electron: string;
   chromium: string;
+  date: string;
 }
