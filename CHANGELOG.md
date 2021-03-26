@@ -1,3 +1,7 @@
+# 2.1.1
+
+- Add "date" to JSON output
+
 # 2.1.0
 
 - Add date of last commit to output

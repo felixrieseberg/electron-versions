@@ -18,8 +18,8 @@ export function readJson({ jsonPath }) {
 export function getJson(versions: Array<Version>) {
   const data = {};
 
-  versions.forEach(({ tag, electron, chromium }) => {
-    data[tag] = { electron, chromium };
+  versions.forEach(({ tag, electron, chromium, date }) => {
+    data[tag] = { electron, chromium, date };
   });
 
   return JSON.stringify(data, undefined, 2);
