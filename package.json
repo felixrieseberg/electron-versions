@@ -10,7 +10,7 @@
   "scripts": {
     "test": "node ./test/test.js",
     "build": "tsc",
-    "prepublish": "npm run build",
+    "prepare": "npm run build",
     "prettier": "npx prettier \"src\" -w"
   },
   "author": "Felix Rieseberg <felix@felixrieseberg.com>",

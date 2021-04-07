@@ -1,3 +1,7 @@
+# 2.1.3
+
+- Actually built code before publishing :lolcry:
+
 # 2.1.2
 
 - Ensure that we parse "master" fresh
