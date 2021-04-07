@@ -1,3 +1,7 @@
+# 2.1.2
+
+- Ensure that we parse "master" fresh
+
 # 2.1.1
 
 - Add "date" to JSON output

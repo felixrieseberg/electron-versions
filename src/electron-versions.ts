@@ -58,7 +58,8 @@ function getElectronVersions(tags = [], options: Options): Array<Version> {
 
     // Maybe we already have info about the tag
     // If we don't, parse fresh
-    if (jsonData[tag]) {
+    // Except for "master"
+    if (jsonData[tag] && tag !== 'master') {
       result.push({
         tag,
         electron: jsonData[tag].electron,
