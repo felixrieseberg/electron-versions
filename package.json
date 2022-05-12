@@ -19,7 +19,7 @@
   "dependencies": {
     "@malept/cross-spawn-promise": "^2.0.0",
     "got": "^11.0.4",
-    "markdown-table": "^2.0.0",
+    "markdown-table": "^3.0.2",
     "minimist": "^1.2.5",
     "semver": "^7.3.4",
     "text-table": "^0.2.0"
