@@ -1,3 +1,7 @@
+# 3.0.0
+
+- Major refactor: Make everything faster.
+
 # 2.1.3
 
 - Actually built code before publishing :lolcry:
