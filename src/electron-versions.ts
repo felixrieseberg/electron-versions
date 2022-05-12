@@ -1,9 +1,9 @@
-import { execSync } from "child_process";
+import { spawn } from "@malept/cross-spawn-promise";
 import * as fs from "fs";
+import got from "got";
 import * as path from "path";
 
 import { satisfies, rcompare, valid } from "semver";
-import { fullVersions } from "electron-to-chromium";
 import { readJson } from "./json";
 import { Options, Version } from "./shared-types";
 import { getTagDate } from "./date";
@@ -12,21 +12,17 @@ import { getTagDate } from "./date";
  * Get Electron and matching Chromium versions for a
  * given directory
  */
-export function getVersions(options: Options): Array<Version> {
-  const currentBranch = getCurrentBranch(options);
-  const tags = getTags(options);
-  const versions = getElectronVersions(tags, options);
-
-  // Switch back to old checkout
-  checkout(currentBranch, options);
+export async function getVersions(options: Options): Promise<Array<Version>> {
+  const tags = await getTags(options);
+  const versions = await getElectronVersions(tags, options);
 
   return versions;
 }
 
-function getTags(options: Options) {
+async function getTags(options: Options) {
   const { filter, cwd, length } = options;
-  const buf = execSync("git tag -l", { cwd });
-  let tags = buf.toString().split(/\s/);
+  const rawTags = await spawn('git', ['tag', '-l'], { cwd });
+  let tags = rawTags.trim().split(/\s/);
 
   // Remove invalid tags
   tags = tags.filter((v) => valid(v));
@@ -43,15 +39,34 @@ function getTags(options: Options) {
   tags = tags.slice(0, length);
 
   // Throw in the default branch
-  tags.unshift(getDefaultBranch(options));
+  tags.unshift(await getDefaultBranch(options));
 
   return tags;
 }
 
-function getElectronVersions(tags = [], options: Options): Array<Version> {
+async function retry<T>(fn: () => Promise<T>, times: number) {
+  for (let attempt = 0; attempt < times; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt === times - 1) throw err;
+    }
+  }
+}
+
+async function getElectronVersions(tags = [], options: Options): Promise<Array<Version>> {
   const { onProgress, jsonPath } = options;
   const result: Array<Version> = [];
-  const jsonData = readJson({ jsonPath });
+  const jsonData = await readJson({ jsonPath });
+
+  const electronIndex = await retry(async () => {
+    const response = await got('https://artifacts.electronjs.org/headers/dist/index.json')
+    if (response.statusCode !== 200) {
+      throw new Error('Failed to fetch Electron index.json');
+    }
+
+    return JSON.parse(response.body);
+  }, 3);
 
   for (let i = 0; i < tags.length; i++) {
     const tag = tags[i];
@@ -64,16 +79,15 @@ function getElectronVersions(tags = [], options: Options): Array<Version> {
         tag,
         electron: jsonData[tag].electron,
         chromium: jsonData[tag].chromium,
-        date: jsonData[tag].date || getTagDate(tag, options),
+        date: jsonData[tag].date || await getTagDate(tag, options),
       });
     } else {
-      checkout(tag, options);
-      const packageJson = readPackageJson(options);
+      const packageJson = await readPackageJson(tag, options);
       const electron =
         (packageJson.devDependencies && packageJson.devDependencies.electron) ||
         (packageJson.dependencies && packageJson.dependencies.electron);
-      const chromium = fullVersions[electron];
-      const date = getTagDate(tag, options);
+      const chromium = electronIndex.find(({ version }) => version === electron)?.chrome;
+      const date = await getTagDate(tag, options);
 
       result.push({ tag, electron, chromium, date });
     }
@@ -86,22 +100,13 @@ function getElectronVersions(tags = [], options: Options): Array<Version> {
   return result;
 }
 
-function getCurrentBranch({ cwd }: Options) {
-  return execSync("git branch --show-current", { cwd }).toString().trim();
-}
-
-function checkout(tag = "", { cwd }: Options) {
-  return execSync(`git checkout ${tag} --quiet`, { cwd });
-}
-
-function readPackageJson({ cwd }: Options) {
-  const jsonPath = path.join(cwd, "package.json");
-  const raw = fs.readFileSync(jsonPath, "utf-8");
+async function readPackageJson(tag: string, { cwd }: Options) {
+  const raw = await spawn('git', ['show', `${tag}:package.json`], { cwd });
   const parsed = JSON.parse(raw);
 
   return parsed;
 }
 
-function getDefaultBranch({ cwd }: Options) {
-  return execSync("git symbolic-ref --short HEAD", { cwd }).toString().trim();
+async function getDefaultBranch({ cwd }: Options) {
+  return (await spawn('git', ['symbolic-ref', '--short', 'HEAD'], { cwd })).trim();
 }

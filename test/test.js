@@ -31,7 +31,7 @@ function test() {
     console.log(`🛑 Tests failed`);
     console.log(`Expected:`);
     console.log(expected);
-    console.log();
+    console.log('\n-------\n');
     console.log(`Received:`);
     console.log(result);
     process.exitCode = -1;

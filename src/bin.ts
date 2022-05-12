@@ -35,17 +35,17 @@ async function main() {
     jsonPath,
   };
 
-  const versions = getVersions(options);
+  const versions = await getVersions(options);
 
   printResult(versions);
 
   if (!!writeMarkdownArg) {
-    writeMarkdown(versions, options);
+    await writeMarkdown(versions, options);
     console.log(`${EOL}Wrote versions to ${mdPath}.`);
   }
 
   if (!!writeJsonArg) {
-    writeJson(versions, options);
+    await writeJson(versions, options);
     console.log(`${EOL}Wrote versions to ${jsonPath}.`);
   }
 }
@@ -120,4 +120,7 @@ function printHelp() {
   text += `write-json      Write results to a json file (optionally, with a path). Speeds up future execution.${EOL}`;
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
