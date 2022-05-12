@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { fileExists } from "./exists";
 
 import { Options, Version } from "./shared-types";
 import { getMarkdownTable } from "./table";
@@ -6,7 +7,7 @@ import { getMarkdownTable } from "./table";
 const START_TABLE = "<!--- Begin Electron Version Table --->";
 const END_TABLE = "<!--- End Electron Version Table --->";
 
-export function writeMarkdown(versions: Array<Version> = [], options: Options) {
+export async function writeMarkdown(versions: Array<Version> = [], options: Options) {
   if (!versions || versions.length === 0) {
     return;
   }
@@ -15,11 +16,11 @@ export function writeMarkdown(versions: Array<Version> = [], options: Options) {
   const table = `${START_TABLE}\n${markdown}\n${END_TABLE}`;
 
   // Check if we already have a file
-  const exists = fs.existsSync(options.mdPath);
+  const exists = await fileExists(options.mdPath);
   let content = "";
 
   if (exists) {
-    content = fs.readFileSync(options.mdPath, "utf-8");
+    content = await fs.promises.readFile(options.mdPath, "utf-8");
 
     const start = content.indexOf(START_TABLE);
     const end = content.indexOf(END_TABLE) + END_TABLE.length;
@@ -35,5 +36,5 @@ export function writeMarkdown(versions: Array<Version> = [], options: Options) {
     content = table;
   }
 
-  fs.writeFileSync(options.mdPath, content);
+  await fs.promises.writeFile(options.mdPath, content);
 }

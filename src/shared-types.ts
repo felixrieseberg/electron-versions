@@ -1,6 +1,7 @@
 export interface Options {
   cwd: string;
   filter: string;
+  allowedPrereleases: string[];
   length: number;
   onProgress?: (done: number, left: number, total: number) => void;
   mdPath: string;

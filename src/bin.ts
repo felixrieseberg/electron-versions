@@ -13,6 +13,7 @@ import { getJson, writeJson } from "./json";
 const argv = require("minimist")(process.argv.slice(2));
 const help = !!(argv["h"] || argv["help"]);
 const filter = argv["f"] || argv["filter"];
+const allowedPrereleases = (argv["p"] || argv["allowed-pre"] || '').split(',');
 const length = argv["l"] || argv["length"] || 10;
 const writeMarkdownArg = argv["write-markdown"];
 const writeJsonArg = argv["write-json"];
@@ -33,19 +34,20 @@ async function main() {
     onProgress,
     mdPath,
     jsonPath,
+    allowedPrereleases,
   };
 
-  const versions = getVersions(options);
+  const versions = await getVersions(options);
 
   printResult(versions);
 
   if (!!writeMarkdownArg) {
-    writeMarkdown(versions, options);
+    await writeMarkdown(versions, options);
     console.log(`${EOL}Wrote versions to ${mdPath}.`);
   }
 
   if (!!writeJsonArg) {
-    writeJson(versions, options);
+    await writeJson(versions, options);
     console.log(`${EOL}Wrote versions to ${jsonPath}.`);
   }
 }
@@ -120,4 +122,7 @@ function printHelp() {
   text += `write-json      Write results to a json file (optionally, with a path). Speeds up future execution.${EOL}`;
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

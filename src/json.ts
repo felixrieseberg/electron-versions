@@ -2,11 +2,11 @@ import * as fs from "fs";
 
 import { Options, Version } from "./shared-types";
 
-export function readJson({ jsonPath }) {
+export async function readJson({ jsonPath }) {
   let data = {};
 
   try {
-    const raw = fs.readFileSync(jsonPath, "utf-8");
+    const raw = await fs.promises.readFile(jsonPath, "utf-8");
     data = JSON.parse(raw);
   } catch (error) {
     // File not found? No biggie
@@ -25,6 +25,6 @@ export function getJson(versions: Array<Version>) {
   return JSON.stringify(data, undefined, 2);
 }
 
-export function writeJson(versions: Array<Version>, { jsonPath }: Options) {
-  fs.writeFileSync(jsonPath, getJson(versions));
+export async function writeJson(versions: Array<Version>, { jsonPath }: Options) {
+  await fs.promises.writeFile(jsonPath, getJson(versions));
 }
