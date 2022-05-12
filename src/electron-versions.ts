@@ -1,9 +1,7 @@
 import { spawn } from "@malept/cross-spawn-promise";
-import * as fs from "fs";
 import got from "got";
-import * as path from "path";
 
-import { satisfies, rcompare, valid } from "semver";
+import { parse, satisfies, rcompare, valid } from "semver";
 import { readJson } from "./json";
 import { Options, Version } from "./shared-types";
 import { getTagDate } from "./date";
@@ -20,7 +18,7 @@ export async function getVersions(options: Options): Promise<Array<Version>> {
 }
 
 async function getTags(options: Options) {
-  const { filter, cwd, length } = options;
+  const { filter, cwd, length, allowedPrereleases } = options;
   const rawTags = await spawn('git', ['tag', '-l'], { cwd });
   let tags = rawTags.trim().split(/\s/);
 
@@ -29,7 +27,17 @@ async function getTags(options: Options) {
 
   // Maybe filter the tags
   if (filter) {
-    tags = tags.filter((v) => satisfies(v, filter));
+    tags = tags.filter((v) => satisfies(v, filter, {
+      includePrerelease: true,
+    }));
+  }
+
+  if (allowedPrereleases.length) {
+    tags = tags.filter((v) => {
+      const parsed = parse(v);
+      if (!parsed.prerelease.length) return true;
+      return allowedPrereleases.some(pre => parsed.prerelease[0].toString().startsWith(pre));
+    })
   }
 
   // Sort them descending

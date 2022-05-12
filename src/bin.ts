@@ -13,6 +13,7 @@ import { getJson, writeJson } from "./json";
 const argv = require("minimist")(process.argv.slice(2));
 const help = !!(argv["h"] || argv["help"]);
 const filter = argv["f"] || argv["filter"];
+const allowedPrereleases = (argv["p"] || argv["allowed-pre"] || '').split(',');
 const length = argv["l"] || argv["length"] || 10;
 const writeMarkdownArg = argv["write-markdown"];
 const writeJsonArg = argv["write-json"];
@@ -33,6 +34,7 @@ async function main() {
     onProgress,
     mdPath,
     jsonPath,
+    allowedPrereleases,
   };
 
   const versions = await getVersions(options);
