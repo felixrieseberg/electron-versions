@@ -19,12 +19,12 @@ export function getTextTable(versions: Array<Version> = []) {
   return textTable(rows);
 }
 
-export function getMarkdownTable(
+export async function getMarkdownTable(
   versions: Array<Version> = [],
   options: Options
 ) {
   const rows = [["Tag", "Electron", "Chromium"]];
-  const repoUrl = getRepoUrl(options);
+  const repoUrl = await getRepoUrl(options);
 
   for (let i = 0; i < versions.length; i++) {
     let { tag, electron, chromium } = versions[i];

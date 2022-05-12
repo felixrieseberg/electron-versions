@@ -12,7 +12,7 @@ export async function writeMarkdown(versions: Array<Version> = [], options: Opti
     return;
   }
 
-  const markdown = getMarkdownTable(versions, options);
+  const markdown = await getMarkdownTable(versions, options);
   const table = `${START_TABLE}\n${markdown}\n${END_TABLE}`;
 
   // Check if we already have a file
