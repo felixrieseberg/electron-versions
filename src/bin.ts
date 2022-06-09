@@ -120,6 +120,7 @@ function printHelp() {
   text += `json:           Print result as JSON${EOL}`;
   text += `write-markdown  Write results to a md file (optionally, with a path)${EOL}`;
   text += `write-json      Write results to a json file (optionally, with a path). Speeds up future execution.${EOL}`;
+  console.log(text);
 }
 
 main().catch((err) => {
