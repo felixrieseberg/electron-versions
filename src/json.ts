@@ -18,13 +18,16 @@ export async function readJson({ jsonPath }) {
 export function getJson(versions: Array<Version>) {
   const data = {};
 
-  versions.forEach(({ tag, electron, chromium, date }) => {
-    data[tag] = { electron, chromium, date };
+  versions.forEach(({ tag, electron, chromium, date, commit }) => {
+    data[tag] = { electron, chromium, date, commit };
   });
 
   return JSON.stringify(data, undefined, 2);
 }
 
-export async function writeJson(versions: Array<Version>, { jsonPath }: Options) {
+export async function writeJson(
+  versions: Array<Version>,
+  { jsonPath }: Options
+) {
   await fs.promises.writeFile(jsonPath, getJson(versions));
 }

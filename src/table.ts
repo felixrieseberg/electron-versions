@@ -7,12 +7,13 @@ import { Options, Version } from "./shared-types";
 export function getTextTable(versions: Array<Version> = []) {
   const rows = [];
 
-  for (const { tag, electron, chromium, date } of versions) {
+  for (const { tag, electron, chromium, date, commit } of versions) {
     rows.push([
       `Tag ${tag}`,
       `Electron ${electron || "?"}`,
       `Chromium ${chromium || "?"}`,
       `Date ${date || "?"}`,
+      `Commit ${commit || "?"}`,
     ]);
   }
 

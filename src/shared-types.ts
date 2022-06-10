@@ -8,9 +8,13 @@ export interface Options {
   jsonPath: string;
 }
 
-export interface Version {
+export interface TagDetails {
+  date: string;
+  commit: string;
+}
+
+export interface Version extends TagDetails {
   tag: string;
   electron: string;
   chromium: string;
-  date: string;
 }

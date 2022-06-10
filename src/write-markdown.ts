@@ -7,7 +7,10 @@ import { getMarkdownTable } from "./table";
 const START_TABLE = "<!--- Begin Electron Version Table --->";
 const END_TABLE = "<!--- End Electron Version Table --->";
 
-export async function writeMarkdown(versions: Array<Version> = [], options: Options) {
+export async function writeMarkdown(
+  versions: Array<Version> = [],
+  options: Options
+) {
   if (!versions || versions.length === 0) {
     return;
   }

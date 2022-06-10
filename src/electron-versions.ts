@@ -4,7 +4,7 @@ import got from "got";
 import { parse, satisfies, rcompare, valid } from "semver";
 import { readJson } from "./json";
 import { Options, Version } from "./shared-types";
-import { getTagDate } from "./date";
+import { getTagDetails } from "./tag";
 
 /**
  * Get Electron and matching Chromium versions for a
@@ -19,7 +19,7 @@ export async function getVersions(options: Options): Promise<Array<Version>> {
 
 async function getTags(options: Options) {
   const { filter, cwd, length, allowedPrereleases } = options;
-  const rawTags = await spawn('git', ['tag', '-l'], { cwd });
+  const rawTags = await spawn("git", ["tag", "-l"], { cwd });
   let tags = rawTags.trim().split(/\s/);
 
   // Remove invalid tags
@@ -27,17 +27,21 @@ async function getTags(options: Options) {
 
   // Maybe filter the tags
   if (filter) {
-    tags = tags.filter((v) => satisfies(v, filter, {
-      includePrerelease: true,
-    }));
+    tags = tags.filter((v) =>
+      satisfies(v, filter, {
+        includePrerelease: true,
+      })
+    );
   }
 
   if (allowedPrereleases.length) {
     tags = tags.filter((v) => {
       const parsed = parse(v);
       if (!parsed.prerelease.length) return true;
-      return allowedPrereleases.some(pre => parsed.prerelease[0].toString().startsWith(pre));
-    })
+      return allowedPrereleases.some((pre) =>
+        parsed.prerelease[0].toString().startsWith(pre)
+      );
+    });
   }
 
   // Sort them descending
@@ -62,15 +66,20 @@ async function retry<T>(fn: () => Promise<T>, times: number) {
   }
 }
 
-async function getElectronVersions(tags = [], options: Options): Promise<Array<Version>> {
+async function getElectronVersions(
+  tags = [],
+  options: Options
+): Promise<Array<Version>> {
   const { onProgress, jsonPath } = options;
   const result: Array<Version> = [];
   const jsonData = await readJson({ jsonPath });
 
   const electronIndex = await retry(async () => {
-    const response = await got('https://artifacts.electronjs.org/headers/dist/index.json')
+    const response = await got(
+      "https://artifacts.electronjs.org/headers/dist/index.json"
+    );
     if (response.statusCode !== 200) {
-      throw new Error('Failed to fetch Electron index.json');
+      throw new Error("Failed to fetch Electron index.json");
     }
 
     return JSON.parse(response.body);
@@ -87,17 +96,20 @@ async function getElectronVersions(tags = [], options: Options): Promise<Array<V
         tag,
         electron: jsonData[tag].electron,
         chromium: jsonData[tag].chromium,
-        date: jsonData[tag].date || await getTagDate(tag, options),
+        date: jsonData[tag].date || (await getTagDetails(tag, options)).date,
+        commit: jsonData[tag].commit || (await getTagDetails(tag, options)).commit,
       });
     } else {
       const packageJson = await readPackageJson(tag, options);
       const electron =
         (packageJson.devDependencies && packageJson.devDependencies.electron) ||
         (packageJson.dependencies && packageJson.dependencies.electron);
-      const chromium = electronIndex.find(({ version }) => version === electron)?.chrome;
-      const date = await getTagDate(tag, options);
+      const chromium = electronIndex.find(
+        ({ version }) => version === electron
+      )?.chrome;
+      const { date, commit } = await getTagDetails(tag, options);
 
-      result.push({ tag, electron, chromium, date });
+      result.push({ tag, electron, chromium, date, commit });
     }
 
     if (!!onProgress) {
@@ -109,12 +121,14 @@ async function getElectronVersions(tags = [], options: Options): Promise<Array<V
 }
 
 async function readPackageJson(tag: string, { cwd }: Options) {
-  const raw = await spawn('git', ['show', `${tag}:package.json`], { cwd });
+  const raw = await spawn("git", ["show", `${tag}:package.json`], { cwd });
   const parsed = JSON.parse(raw);
 
   return parsed;
 }
 
 async function getDefaultBranch({ cwd }: Options) {
-  return (await spawn('git', ['symbolic-ref', '--short', 'HEAD'], { cwd })).trim();
+  return (
+    await spawn("git", ["symbolic-ref", "--short", "HEAD"], { cwd })
+  ).trim();
 }
